@@ -1,0 +1,30 @@
+FROM acidaniel/php7:71
+
+ARG BUILD_DATE
+ARG VCS_REF
+
+LABEL org.label-schema.build-date=$BUILD_DATE \
+  org.label-schema.vcs-ref=$VCS_REF \
+  org.label-schema.schema-version="1.0" \
+  org.label-schema.name="docker-php" \
+  org.label-schema.description="PHP-FPM Alpine for Drupal - composer & drush" \
+  org.label-schema.vcs-url="https://github.com/acidaniel/docker-php" \
+  maintainer="Daniel Serna <acidaniel@gmail.com>"
+
+RUN set -e \
+  && mkdir -p /var/www \
+  && addgroup -g 1000 -S www-data \
+  && adduser -u 1000 -D -S -G www-data www-data \
+  && apk add --upgrade --no-cache \
+  --repository http://nl.alpinelinux.org/alpine/edge/community \
+  php7-fpm
+
+COPY php-fpm.conf /etc/php7/
+
+#USER www-data
+WORKDIR /var/www/html
+VOLUME /var/www/html
+
+EXPOSE 9000
+
+CMD ["php-fpm7", "-F"]
